@@ -1,0 +1,13 @@
+{
+  "backend": "sqlalchemy",
+  "database_url_env": "QANUNTRACE_DATABASE_URL",
+  "schema": "public",
+  "table": "legal_records",
+  "fields": {
+    "source_id": "source_id", "instrument_id": "instrument_id",
+    "edition_id": "edition_id", "kind": "kind", "reference": "article_number",
+    "exact_text": "original_text", "source_uri": "source_uri",
+    "source_hash": "sha256_utf8", "effective_from": "valid_from",
+    "effective_to": "valid_to"
+  }
+}
