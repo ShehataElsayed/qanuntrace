@@ -1,0 +1,7 @@
+{
+  "backend": "opensearch", "database_url_env": "QANUNTRACE_SEARCH_URL",
+  "index": "legal-records",
+  "fields": {"source_id":"source_id", "instrument_id":"instrument_id",
+             "edition_id":"edition_id", "kind":"kind", "reference":"reference",
+             "exact_text":"exact_text", "source_uri":"source_uri", "source_hash":"source_hash"}
+}
