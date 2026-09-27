@@ -1,17 +1,73 @@
 # QanunTrace
 
+[![PyPI version](https://img.shields.io/pypi/v/qanuntrace.svg)](https://pypi.org/project/qanuntrace/) [![CI](https://github.com/ShehataElsayed/qanuntrace/actions/workflows/ci.yml/badge.svg)](https://github.com/ShehataElsayed/qanuntrace/actions/workflows/ci.yml) [![Python](https://img.shields.io/pypi/pyversions/qanuntrace.svg)](https://pypi.org/project/qanuntrace/)
+
 A provider-neutral, database-neutral legal evidence pipeline. This package contains code and synthetic test fixtures only. It does not include Saudi legal texts, judgments, a crawler, or a database connection to your systems.
 
 **Scope and assurance:** QanunTrace checks exact quotations against records supplied by a deployment. Source currency, completeness, relevance, statutory interpretation and judgment effect require qualified legal review and integration testing. It is not legal advice or a certified compliance system.
 
-## Quick start
+## Install and try it
+
+From PyPI (Python 3.10 or newer):
+
+```bash
+python -m pip install qanuntrace
+```
+
+Run this entirely synthetic example. It uses an in-memory record and a fixed stand-in generator, so it does not call an AI service or fetch Saudi legal text:
+
+```python
+"""Synthetic end-to-end demo. No legal corpus, credentials, or network access."""
+import json
+
+from qanuntrace import LegalRecord, Pipeline, Query
+from qanuntrace.adapters import MemoryStore
+from qanuntrace.generators import CallableGenerator
+
+record = LegalRecord.make(
+    "sample-1", "synthetic-law", "v1", "article", "1",
+    "لا يجوز تغيير النص التجريبي.", "fixture:local",
+)
+
+
+def propose(_system: str, _user: str) -> str:
+    """A fixed stand-in for a model; it proposes a source span, not legal advice."""
+    return json.dumps([{
+        "source_id": record.source_id,
+        "instrument_id": record.instrument_id,
+        "edition_id": record.edition_id,
+        "reference": record.reference,
+        "start": 0,
+        "end": len(record.exact_text),
+        "proposed_quote": record.exact_text,
+    }], ensure_ascii=False)
+
+
+answer = Pipeline(MemoryStore([record]), CallableGenerator(propose)).answer(
+    Query("النص التجريبي", instrument_id="synthetic-law", reference="1")
+)
+print(answer.status)
+print(answer.text)
+```
+
+Expected output (the `fixture:local` URI is not an official legal source):
+
+```text
+verified_quote
+[sample-1] "لا يجوز تغيير النص التجريبي." (fixture:local)
+```
+
+The same runnable example is [`examples/quickstart.py`](https://github.com/ShehataElsayed/qanuntrace/blob/main/examples/quickstart.py). A longer synthetic example is in `examples/local_demo.py`. Neither proves legal correctness or access control in your deployment. The model *proposes* a quoted span; QanunTrace verifies it against the supplied record. It does not validate legal interpretation.
+
+For contributors, from the repository root:
 
 ```bash
 python -m pip install -e '.[dev,sql]'
 pytest -q
+ruff check src tests
 ```
 
-`examples/local_demo.py` shows a synthetic in-memory source. Run `python examples/local_demo.py` after installing. The team-facing integration guide is in `docs/INTEGRATION.md` and `docs/INTEGRATION_AR.md`.
+See the [English integration guide](https://github.com/ShehataElsayed/qanuntrace/blob/main/docs/INTEGRATION.md) or [Arabic integration guide](https://github.com/ShehataElsayed/qanuntrace/blob/main/docs/INTEGRATION_AR.md) to connect an authorized database, scopes and a model. The [`tests/` directory](https://github.com/ShehataElsayed/qanuntrace/tree/main/tests) contains synthetic tests, not a Saudi-law acceptance benchmark.
 
 ## Pipeline
 
