@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 [project]
 name = "qanuntrace"
-version = "0.1.0"
+version = "0.2.0"
 description = "Source-grounded legal retrieval and exact-quote verification pipeline"
 readme = "README.md"
 requires-python = ">=3.10"
