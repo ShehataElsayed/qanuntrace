@@ -49,3 +49,31 @@ The package name is QanunTrace. The repository includes Python source, tests, ex
 ## Configuration without editing code
 
 For a SQL table with the documented fields, copy `examples/config/sqlite.json` or `postgres.json`, map your column names, set `QANUNTRACE_DATABASE_URL` in your environment, then run `qanuntrace-doctor your-config.json`. The doctor performs a read-only sample query and hash check. For JSONL use its example config. Search engine, vector and NoSQL connectors need a configured client or a custom adapter in the embedding application; they are not zero-code connectors. A team cannot safely integrate an unknown schema or judgment ontology by config alone without validation.
+
+## Legal structure and evaluation modules
+
+`legal.article_mentions` identifies numeric article mentions in Arabic text, while `link_candidates` returns review-only links to matching-number articles. `edition_diff` reports textual edits between two verified records of the same article. None infers legal effect or resolves competing laws. `evaluation.evaluate` computes source/quote/abstention rates on a professionally reviewed gold set; `review.review_queue` exports withheld proposed interpretations. Written-out article ordinals and complex Arabic morphology are not fully parsed.
+
+## Persistent review memory
+
+`SQLiteReviewMemory` stores reviewer annotations with tenant, reviewer, time and source hash. When the source hash changes it refuses to return the old annotation as current. `forget` deletes an entry. `EphemeralCache` is bounded and keys entries by tenant/source/hash/query. These are notes and performance aids, **never authority for a legal answer**; the pipeline always returns to the authoritative database for quotation. This is a basic reference backend, not a "giant" scalable memory system: Postgres/Redis/distributed tenancy, retention, encryption, audit access and erasure operations require deployment-specific engineering and review.
+
+## Evidence graph
+
+`EvidenceGraph` stores typed relations between source IDs with exact supporting spans and a reviewer identity for substantive links. It can expand reviewed neighbors up to bounded hops/nodes, re-reading the source for each edge. This is a reference in-process graph; it does not yet persist to Neo4j/Postgres or discover legal concepts automatically. A same-number article candidate is never automatically an `applies` relation.
+
+## Professional review modes
+
+`reasoning.make_review_plan` offers three structured, review-only checklists: lawyer (issues, support, adverse authority, procedure), counsel (facts, current rules, risks, alternatives) and judge (fact characterization, rule hierarchy/temporal applicability, evidence, reasons). These are not simulated legal professionals or judicial decisions. They do not apply Saudi source hierarchy automatically; every proposed application and conclusion requires an exact source span and qualified human review.
+
+## Query understanding
+
+`query.parse_query` preserves the original question, creates a separate search-normalized form, recognizes a small set of Arabic/English numeric and written-out article references, accepts caller-provided law-name aliases, classifies basic intent and requests clarification for ambiguous article/law scope. It does not silently choose between statutes. This is a conservative baseline, not full dialect or typo understanding; real Saudi legal queries need an annotated evaluation set and optional pluggable language analysis.
+
+## File ingestion
+
+`Extractor` reads UTF-8 text/Markdown/JSON/HTML/XML, CSV, PDF (`pypdf`), DOCX (`python-docx`) and XLSX (`openpyxl`). A bounded ZIP reader rejects path traversal, oversized entries and oversized expansion. Plug an OCR callback for images or a transcription callback for audio/video. Extracted text always carries a file hash and page/row/cell/paragraph/media locator, and is marked `needs_review`. Scanned-PDF OCR and video keyframes require external processing adapters; no legal text extracted from files is automatically trusted. Install `.[ingest]` for document dependencies. Excel formulas are read as cached values only.
+
+## Arabic language and dates
+
+`arabic.gulf_search_key` applies a conservative Saudi/Gulf colloquial lexicon to retrieval keys, not legal quotations. `number_word` recognizes digits, ordinal/cardinal units and simple compounds through 99; unsupported phrases return `None`. `parse_date` accepts Arabic/Persian/Western digit dates with explicit Hijri/Gregorian markers, and the optional `hijridate` Umm al-Qura converter. Unmarked calendar dates are rejected as ambiguous. It does not claim all Arabic dialects, full Arabic number grammar or authoritative Hijri conversion outside the library's supported range; the official source date prevails.
