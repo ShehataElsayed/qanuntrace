@@ -2,7 +2,7 @@
 
 A provider-neutral, database-neutral legal evidence pipeline. This package contains code and synthetic test fixtures only. It does not include Saudi legal texts, judgments, a crawler, or a database connection to your systems.
 
-**Status:** integration candidate, not production-certified. Exact quotations are programmatically checked against the text supplied by your database, but relevance, completeness, currency, statutory interpretation and the legal effect of judgments are not guaranteed. This is not legal advice. A deployer must perform legal review and integration testing before relying on it.
+**Scope and assurance:** QanunTrace checks exact quotations against records supplied by a deployment. Source currency, completeness, relevance, statutory interpretation and judgment effect require qualified legal review and integration testing. It is not legal advice or a certified compliance system.
 
 ## Quick start
 
@@ -44,7 +44,7 @@ Copyright 2026 Shehata El-sayed. Licensed under Apache-2.0; see LICENSE. Legal s
 
 ## Source and distribution
 
-The package name is QanunTrace. The repository includes Python source, tests, examples and docs; release artifacts include the wheel and source distribution. Version 0.1.0 identifies the integration candidate, not a certified legal version. The Apache-2.0 license applies to original code only; legal-source data carries separate rights.
+The package name is QanunTrace. The repository includes Python source, tests, examples and docs; release artifacts include the wheel and source distribution. Version 0.2.0 adds guarded integration building blocks; no release version is a certification of legal conclusions or a particular deployment. The Apache-2.0 license applies to original code only; legal-source data carries separate rights.
 
 ## Configuration without editing code
 
@@ -77,3 +77,17 @@ For a SQL table with the documented fields, copy `examples/config/sqlite.json` o
 ## Arabic language and dates
 
 `arabic.gulf_search_key` applies a conservative Saudi/Gulf colloquial lexicon to retrieval keys, not legal quotations. `number_word` recognizes digits, ordinal/cardinal units and simple compounds through 99; unsupported phrases return `None`. `parse_date` accepts Arabic/Persian/Western digit dates with explicit Hijri/Gregorian markers, and the optional `hijridate` Umm al-Qura converter. Unmarked calendar dates are rejected as ambiguous. It does not claim all Arabic dialects, full Arabic number grammar or authoritative Hijri conversion outside the library's supported range; the official source date prevails.
+
+## Enterprise integration building blocks (v0.2.0)
+
+The following modules are local building blocks, not deployment certification. `legal_reference.parse_legislative_reference` parses a bounded set of Arabic article, repeated-article, paragraph and item references, returning `needs_review` when an expression is outside its grammar. `privacy.redact` masks some syntactic IDs, Saudi mobile numbers and emails; it does not reliably detect names, context-dependent identifiers, financial data or OCR errors. `gateway.prepare_remote_transfer` blocks transfer until the deploying app records policy approval and reviews the redacted data. These are not automatic PDPL/GDPR compliance or an excuse to send confidential client files to a third-party model.
+
+`temporal.version_view` compares caller-curated effective-date intervals and flags missing/overlapping versions; it cannot know whether the corpus is complete. `retrieval.HybridStore` combines lexical/vector IDs with reciprocal-rank fusion, hydrating through the authority store and requiring a principal-bound authorization predicate. The deployer must enforce ACL/RLS before either search index sees confidential text and on every `get`; `access.AuthorizedStore` is an additional deny-by-default application guard, not a substitute for database RLS. `provenance.verify_signed_source` accepts an upstream signer and pinned verifier; generating a hash ourselves would not authenticate the publisher. `metrics` reports exact-span verification rates and separately aggregates supplied human faithfulness/relevance labels, not automated legal truth. `health.health_check` returns a read-only one-record, no-private-ID JSON-compatible report.
+
+`secondary.boe_reference` validates caller-supplied Bureau of Experts links as secondary references without fetching or redistributing text. BOE's own [FAQ](https://www.boe.gov.sa/ar/Help/FAQ/Pages/default.aspx) says its consolidations are periodic and the Gazette/National Center are the immediate official publication sources. `government.approved_get` is only a fixed-host, opt-in transport hook for an approved endpoint and a caller-supplied TLS/timeout/no-redirect client; it neither registers an account nor assumes endpoint access, licensing, rights, freshness or response schema. The [Najiz developer catalog](https://developers.najiz.sa/en/api-catalog) has case/judgment services that require service-specific registration and approval. [MOJ open-data policy](https://www.moj.gov.sa/ar/OpenData/Pages/OpenDataPolicy.aspx) supports machine-readable datasets, but no public full-text statutes/judgments API endpoint is verified for this package. The [Saudi Bar Association legal library API](https://library-api.sba.gov.sa/) was unavailable when checked. These endpoints are integration candidates, not live QanunTrace connectors.
+
+A `CuratedOntology` accepts only reviewer-attributed search aliases. It returns candidate concept IDs and never treats "contract" and "obligation" as interchangeable legal rules. A deployer-supplied morphology analyzer may augment search terms after an annotated Arabic benchmark; no CAMeL model or weights ship here. Do not present either expansion as source text or as legal entailment.
+
+`cache.VerifiedCache` binds values to tenant, principal scope, source ID/hash, effective interval and a query hash. It checks the authoritative current hash on every read and evicts a changed source; callers can also invalidate by source on an approved amendment event. This is an in-process reference, not a Redis deployment or a Gazette watcher. It cannot detect amendments the authoritative database has not ingested.
+
+`model_bridge.TextModel` and `ProposalBridge` provide a small provider-agnostic interface for local/open-weight model runners or remote APIs. The deployer supplies `complete(system, user)`, an explicit transfer policy, a schema-compatible model response and a tested adapter. OpenAI-compatible SDK clients can target a local server with a configurable base URL; Anthropic and Google wrappers are available as optional transport examples. Ollama, vLLM, Transformers and custom APIs are possible via `FunctionModel`, but no claim is made that every model version has been integration-tested. The bridge bounds context size and feeds only structured proposals back to the verified pipeline. A remote provider still requires the deployment's privacy/legal data-transfer review; use `gateway.prepare_remote_transfer` or an equivalent reviewed policy before sending case data.
