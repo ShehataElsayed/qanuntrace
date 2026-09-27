@@ -45,3 +45,19 @@ See `examples/config/{sqlite,postgres,jsonl}.json`. Set `QANUNTRACE_DATABASE_URL
 `examples/config/mongodb.json` uses a MongoDB text index (`$text`) and `QANUNTRACE_MONGO_URL`; `elasticsearch.json` and `opensearch.json` use their standard clients, a named index and `QANUNTRACE_SEARCH_URL`. Exact source fields must be mapped, and local ACL enforcement remains the team's responsibility. Their indices must be configured by your team; `doctor` only checks that a sample record can be read.
 
 `examples/config/qdrant.json` uses Qdrant vector IDs and hydrates exact records from the configured authoritative SQL store. Set `QANUNTRACE_QDRANT_URL` and optionally `QANUNTRACE_QDRANT_API_KEY`. Vector search requires a matching embedding function, loaded from your application module named in `embedding_callable`; that function must be supplied and versioned by the team because no universal embedding matches every vector index. For pgvector, use the standard PostgreSQL SQLAlchemy backend with your own preexisting pgvector search query or a custom `LegalStore`. There is no safe universal similarity metric/index configuration to infer. No connector can guess a proprietary schema, index, tenant policy or provider-specific auth settings.
+
+## Security and source architecture (v0.2.0)
+
+```text
+Authorized app principal -> DB/RLS -> LegalStore.get/search -> hydrated source IDs
+                                  |-> lexical + vector indices (IDs only)
+                                  |-> version intervals + BOE secondary links
+                                  -> exact quote + optional trusted upstream signature
+                                  -> human review -> permitted redacted model transfer
+```
+
+The source DB must enforce tenant ACL/RLS before any text reaches indexes, caches, logs or models. Use a tenant-bound adapter and a pinned upstream public key if signed provenance is available. BOE links are secondary and never prove currency; Gazette ingestion requires a separately licensed/approved source. Najiz API access requires the deploying organization to register and obtain a specific service grant. A configured `approved_get` endpoint alone is not a grant; deployers must supply an approved endpoint, bounded client, data rights and schema tests. No API keys belong in the repository. Keep redaction maps local, encrypted and access-controlled if the application adds reversible pseudonyms. Do not automatically restore original identities to model output.
+
+## Local and API model adapters
+
+Provide a `TextModel.complete(system, user)` method, or wrap a callable in `FunctionModel`. The callable can invoke a local Ollama/vLLM/Transformers runtime or an API SDK, but model names, token limits, output shape, auth and residency depend on the deployed version. `ProposalBridge` requires an `approve_transfer(query, records)` callback and bounds the total context; it does not itself redact records. Pair a remote model with a reviewed redaction policy, use only sources the principal can access, parse proposals as JSON, and pass them to `Pipeline` for exact-span verification. Test each chosen provider and model release using the labeled legal cases; do not infer compatibility from a protocol alone.
