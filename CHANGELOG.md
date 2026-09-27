@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 - 2026-09-27
+
+- Add conservative Arabic legislative reference parsing and reviewed ontology search hints.
+- Add opt-in PII redaction/transfer gates, principal-bound store guard and hybrid ID-ranking helper.
+- Add caller-curated temporal views, upstream signature verification hook, source-hash cache and read-only health report.
+- Add BOE secondary URL reference and guarded transport interface for approved government API contracts; no live official data connector, corpus or credentials are included.
+- Expand bilingual integration guidance and synthetic tests. Real-source rights, official API grants, DB RLS and legal acceptance remain deployment gates.
+
 ## 0.1.0 - 2026-09-27
 
 - Initial provider- and database-neutral evidence pipeline, exact-quote checks and audit stages.
