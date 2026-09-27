@@ -1,17 +1,22 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 [project]
 name = "qanuntrace"
-version = "0.2.0"
+version = "0.2.1"
 description = "Source-grounded legal retrieval and exact-quote verification pipeline"
 readme = "README.md"
 requires-python = ">=3.10"
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 authors = [{name = "Shehata El-sayed"}]
 keywords = ["legal", "retrieval", "arabic", "evidence", "rag"]
 classifiers = ["Programming Language :: Python :: 3", "Programming Language :: Python :: 3.10", "Programming Language :: Python :: 3.11", "Programming Language :: Python :: 3.12", "Programming Language :: Python :: 3.13", "Operating System :: OS Independent"]
 dependencies = []
+[project.urls]
+Homepage = "https://github.com/ShehataElsayed/qanuntrace"
+Documentation = "https://github.com/ShehataElsayed/qanuntrace/blob/main/docs/INTEGRATION.md"
+Repository = "https://github.com/ShehataElsayed/qanuntrace"
+Issues = "https://github.com/ShehataElsayed/qanuntrace/issues"
 [project.optional-dependencies]
 sql = ["sqlalchemy>=2,<3"]
 elastic = ["elasticsearch>=8,<10"]
