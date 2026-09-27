@@ -1,0 +1,6 @@
+{
+  "backend": "qdrant", "database_url_env": "QANUNTRACE_QDRANT_URL",
+  "api_key_env": "QANUNTRACE_QDRANT_API_KEY", "collection": "legal-vectors",
+  "embedding_callable": "your_application.embeddings:embed_query",
+  "authority_config": "examples/config/postgres.json"
+}
