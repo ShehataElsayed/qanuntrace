@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 - 2026-09-27
+
+- Add a runnable synthetic end-to-end example and expected output to the README and examples directory.
+- Separate PyPI installation from contributor setup; link the integration guides and tests.
+- Add project URLs and status badges. No changes to legal verification or government integration claims.
+
 ## 0.2.0 - 2026-09-27
 
 - Add conservative Arabic legislative reference parsing and reviewed ontology search hints.
