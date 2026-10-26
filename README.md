@@ -1,5 +1,7 @@
 # QanunTrace
 
+> **License:** All rights reserved from this version onward; no use, copying, modification, or redistribution without the owner's prior written permission. Earlier releases remain under their original license (see LICENSE).
+
 [![PyPI version](https://img.shields.io/pypi/v/qanuntrace.svg)](https://pypi.org/project/qanuntrace/) [![CI](https://github.com/ShehataElsayed/qanuntrace/actions/workflows/ci.yml/badge.svg)](https://github.com/ShehataElsayed/qanuntrace/actions/workflows/ci.yml) [![Python](https://img.shields.io/pypi/pyversions/qanuntrace.svg)](https://pypi.org/project/qanuntrace/)
 
 A provider-neutral, database-neutral legal evidence pipeline. This package contains code and synthetic test fixtures only. It does not include Saudi legal texts, judgments, a crawler, or a database connection to your systems.
@@ -147,3 +149,4 @@ A `CuratedOntology` accepts only reviewer-attributed search aliases. It returns 
 `cache.VerifiedCache` binds values to tenant, principal scope, source ID/hash, effective interval and a query hash. It checks the authoritative current hash on every read and evicts a changed source; callers can also invalidate by source on an approved amendment event. This is an in-process reference, not a Redis deployment or a Gazette watcher. It cannot detect amendments the authoritative database has not ingested.
 
 `model_bridge.TextModel` and `ProposalBridge` provide a small provider-agnostic interface for local/open-weight model runners or remote APIs. The deployer supplies `complete(system, user)`, an explicit transfer policy, a schema-compatible model response and a tested adapter. OpenAI-compatible SDK clients can target a local server with a configurable base URL; Anthropic and Google wrappers are available as optional transport examples. Ollama, vLLM, Transformers and custom APIs are possible via `FunctionModel`, but no claim is made that every model version has been integration-tested. The bridge bounds context size and feeds only structured proposals back to the verified pipeline. A remote provider still requires the deployment's privacy/legal data-transfer review; use `gateway.prepare_remote_transfer` or an equivalent reviewed policy before sending case data.
+
